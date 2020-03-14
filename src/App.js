@@ -2,16 +2,19 @@ import React, { Component } from "react";
 import Particles from "react-particles-js";
 import Clarifai from "clarifai";
 import Navigation from "./components/Navigation/Navigation";
+import Signin from "./components/Signin/Signin";
+import Register from "./components/Register/Register";
 import Logo from "./components/Logo/Logo";
 import ImageLinkForm from "./components/ImageLinkForm/ImageLinkForm";
 import Rank from "./components/Rank/Rank";
 import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
+
 import "./App.css";
 
 const app = new Clarifai.App({
   apiKey: "cc78d8e2640545a1968b375ebb105457"
 });
-
+// parameter for particles 
 const particlesOptions = {
   particles: {
     number: {
@@ -24,6 +27,7 @@ const particlesOptions = {
   }
 };
 
+
 class App extends Component {
   //constructor for the state
   constructor() {
@@ -33,7 +37,9 @@ class App extends Component {
       input: "",
       //the link that come from input
       imageUrl: "",
-      box: {}
+      box: {},
+      //track where we are one the page
+      route: "signin"
     };
   }
   // this function receive data, base on the response
@@ -83,23 +89,46 @@ class App extends Component {
       );
   };
 
+
+
+  onRouteChange = (route) =>{
+    // it's for change the sign route state   state property : state value  , value is changeg by on click in the component who are linked with props
+    this.setState({route:route});
+    console.log(route)
+
+
+  }
+
+
   render() {
     return (
       <div className="App">
         <Particles className="particles" params={particlesOptions} />
-        <Navigation />
-        <Logo />
-        <Rank />
-        {/*we pass onInputChange like a props and use this for link the class onInputChange property*/}
-        <ImageLinkForm
-          onInputChange={this.onInputChange}
-          onButtonSubmit={this.onButtonSubmit}
-        />
-        {/*we pass ImageUrl like a props and use this for lthe input with the image for diplay it here
-                ater passed like a propr i can use image url in my component*/}
 
-         {/*we pass Box state to our component*/}
-        <FaceRecognition box ={this.state.box} imageUrl={this.state.imageUrl} />
+        <Navigation onRouteChange={this.onRouteChange} />
+        
+
+        {this.state.route === "signin" ?
+          <Signin onRouteChange={this.onRouteChange} />
+            : <div>
+            <Register />
+            <Logo />
+            <Rank />
+            {/*we pass onInputChange like a props and use this for link the class onInputChange property*/}
+            <ImageLinkForm
+              onInputChange={this.onInputChange}
+              onButtonSubmit={this.onButtonSubmit}
+            />
+            {/*we pass ImageUrl like a props and use this for lthe input with the image for diplay it here
+                after passed like a propr i can use image url in my component*/}
+
+            {/*we pass Box state to our component*/}
+            <FaceRecognition
+              box={this.state.box}
+              imageUrl={this.state.imageUrl}
+            />
+          </div>
+        }
       </div>
     );
   }
