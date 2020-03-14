@@ -8,12 +8,9 @@ import Rank from "./components/Rank/Rank";
 import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
 import "./App.css";
 
-
-
 const app = new Clarifai.App({
-  apiKey: 'cc78d8e2640545a1968b375ebb105457'
+  apiKey: "cc78d8e2640545a1968b375ebb105457"
 });
-
 
 const particlesOptions = {
   particles: {
@@ -33,29 +30,52 @@ class App extends Component {
     super();
     this.state = {
       //what user have put in input
-      input: '',
-      imageUrl :""
+      input: "",
+      //the link that come from input
+      imageUrl: "",
+      box:{}
+    };
+  }
+// this function receive data, base on the response
+  calculateFaceLocation = (data) =>{
+    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById('inputimage');
+    const width = Number(image.width);
+    const height = Number(image.height);
+    // we are returning an object that will fil the box object in the state, thw returned objet will figureout all the four dot arround the face
+    return{
+      //the pourcentage of the width  * width
+      leftCol : clarifaiFace.lef_col * width,
+      topRow : clarifaiFace.top_row * height,
+      rightCol :width - (clarifaiFace.right_col.width)
+      
+      
+
+
     }
   }
-  // event listener who wait for a new event from input to do an action, we pass the  onInputchange to the form on a props, is a property of the app
 
-  onInputChange = (event) => {
-    console.log(event.target.value)
-  }
 
+  // event listener who wait for a new event from input to do an action, we pass the onInputchange to the form on a props, is a property of the app
+  onInputChange = event => {
+    this.setState({ input: event.target.value });
+  };
+  //imageUrl get display on FaceRecognition component when we click on submti
   onButtonSubmit = () => {
-    console.log('click')
-    app.models.predict(Clarifai.COLOR_MODEL, "https://samples.clarifai.com/face-det.jpg").then(
-      function (response) {
-        console.log(response)
-        // do something with response
-      },
-      function (err) {
-        // there was an error
-      }
-    );
+    this.setState({ imageUrl: this.state.input });
 
-  }
+    console.log("click");
+    app.models.predict(
+      Clarifai.FACE_DETECT_MODEL, 
+      this.state.input)
+      //get a response (bunding box)
+      .then(response => this.calculateFaceLocation(response)
+      //promise
+      .catch(err => {console.log(err)})
+
+      
+    );
+  };
 
   render() {
     return (
@@ -65,11 +85,14 @@ class App extends Component {
         <Logo />
         <Rank />
         {/*we pass onInputChange like a props and use this for link the class onInputChange property*/}
-        <ImageLinkForm onInputChange={this.onInputChange}
-          onButtonSubmit={this.onButtonSubmit} />
+        <ImageLinkForm
+          onInputChange={this.onInputChange}
+          onButtonSubmit={this.onButtonSubmit}
+        />
+        {/*we pass ImageUrl like a props and use this for lthe input with the image for diplay it here
+                ater passed like a propr i can use image url in my component*/}
 
-
-        <FaceRecognition />
+        <FaceRecognition imageUrl={this.state.imageUrl} />
       </div>
     );
   }
