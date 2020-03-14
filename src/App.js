@@ -33,28 +33,31 @@ class App extends Component {
       input: "",
       //the link that come from input
       imageUrl: "",
-      box:{}
+      box: {}
     };
   }
-// this function receive data, base on the response
-  calculateFaceLocation = (data) =>{
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-    const image = document.getElementById('inputimage');
+  // this function receive data, base on the response
+  calculateFaceLocation = data => {
+    console.log(data.outputs[0].data.regions[0].region_info.bounding_box);
+    const clarifaiFace =
+      data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById("inputimage");
     const width = Number(image.width);
     const height = Number(image.height);
     // we are returning an object that will fil the box object in the state, thw returned objet will figureout all the four dot arround the face
-    return{
+    return {
       //the pourcentage of the width  * width
-      leftCol : clarifaiFace.lef_col * width,
-      topRow : clarifaiFace.top_row * height,
-      rightCol :width - (clarifaiFace.right_col.width)
-      
-      
-
-
-    }
-  }
-
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - clarifaiFace.right_col * width,
+      bottomRow: height - clarifaiFace.bottom_row * height
+    };
+  };
+  // filup the box withe the value of calculateFaceLocation
+  displayFaceBox = box => {
+    console.log(box);
+    this.setState({ box: box });
+  };
 
   // event listener who wait for a new event from input to do an action, we pass the onInputchange to the form on a props, is a property of the app
   onInputChange = event => {
@@ -65,16 +68,19 @@ class App extends Component {
     this.setState({ imageUrl: this.state.input });
 
     console.log("click");
-    app.models.predict(
-      Clarifai.FACE_DETECT_MODEL, 
-      this.state.input)
+    app.models
+      .predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
       //get a response (bunding box)
-      .then(response => this.calculateFaceLocation(response)
-      //promise
-      .catch(err => {console.log(err)})
-
-      
-    );
+      // when we click the button we want calculate face location whit the response we going to run the calculate faceLocation function
+      // the fonction returnr an object in the state boix , the box is needed by the displaFaceBox
+      //when we get the response , we calculateFaceLocation and the display it with displayFacebox
+      .then(response =>
+        this.displayFaceBox(this.calculateFaceLocation(response))
+          //promise
+          .catch(err => {
+            console.log(err);
+          })
+      );
   };
 
   render() {
@@ -92,7 +98,8 @@ class App extends Component {
         {/*we pass ImageUrl like a props and use this for lthe input with the image for diplay it here
                 ater passed like a propr i can use image url in my component*/}
 
-        <FaceRecognition imageUrl={this.state.imageUrl} />
+         {/*we pass Box state to our component*/}
+        <FaceRecognition box ={this.state.box} imageUrl={this.state.imageUrl} />
       </div>
     );
   }
