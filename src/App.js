@@ -14,7 +14,7 @@ import "./App.css";
 const app = new Clarifai.App({
   apiKey: "cc78d8e2640545a1968b375ebb105457"
 });
-// parameter for particles 
+// parameter for particles
 const particlesOptions = {
   particles: {
     number: {
@@ -27,7 +27,6 @@ const particlesOptions = {
   }
 };
 
-
 class App extends Component {
   //constructor for the state
   constructor() {
@@ -39,7 +38,9 @@ class App extends Component {
       imageUrl: "",
       box: {},
       //track where we are one the page
-      route: "signin"
+      route: "signin",
+      // used for the navigation button sign in and register
+      isSignedIn: false
     };
   }
   // this function receive data, base on the response
@@ -89,29 +90,31 @@ class App extends Component {
       );
   };
 
-
-
-  onRouteChange = (route) =>{
-    // it's for change the sign route state   state property : state value  , value is changeg by on click in the component who are linked with props
-    this.setState({route:route});
-    console.log(route)
-
-
-  }
-
+  onRouteChange = (route) => {
+    // userd for button signin , signt out and regisiter on the navigation component
+    if (route === "signOut") {
+      this.setState({ isSignedIn: false });
+    } else if (route === "home") {
+      this.setState({ isSignedIn: true });
+    } // it's for change the sign route state   state property : state value  , value is changeg by on click in the component who are linked with props
+    this.setState({ route: route });
+  };
 
   render() {
+    // without destructuring i have to wire this.state.box , this.state. route etccc so    
+    const {isSignedIn,imageUrl,box,route} = this.state
+ 
+
     return (
       <div className="App">
         <Particles className="particles" params={particlesOptions} />
+    {/* isSignedIn is passed by pros form the state, if it's true sign out appear else register and sign in appear
+    i used destructing
+    */}
+        <Navigation isSignedIn={isSignedIn}   onRouteChange={this.onRouteChange} />
 
-        <Navigation onRouteChange={this.onRouteChange} />
-        
-
-        {this.state.route === "signin" ?
-          <Signin onRouteChange={this.onRouteChange} />
-            : <div>
-            <Register />
+        {this.state.route === "home" ? (
+          <div>
             <Logo />
             <Rank />
             {/*we pass onInputChange like a props and use this for link the class onInputChange property*/}
@@ -119,16 +122,18 @@ class App extends Component {
               onInputChange={this.onInputChange}
               onButtonSubmit={this.onButtonSubmit}
             />
-            {/*we pass ImageUrl like a props and use this for lthe input with the image for diplay it here
-                after passed like a propr i can use image url in my component*/}
-
+            {/*we pass ImageUrl like a props and use this for lthe input with the image for diplay it here after passed like a propr i can use image url in my component*/}{" "}
             {/*we pass Box state to our component*/}
             <FaceRecognition
-              box={this.state.box}
-              imageUrl={this.state.imageUrl}
+              box={box}
+              imageUrl={imageUrl}
             />
           </div>
-        }
+        ) : route === "signin" ? (
+          <Signin onRouteChange={this.onRouteChange} />
+        ) : (
+          <Register onRouteChange={this.onRouteChange} />
+        )}
       </div>
     );
   }
