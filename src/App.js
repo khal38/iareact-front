@@ -43,6 +43,10 @@ class App extends Component {
       isSignedIn: false
     };
   }
+
+// fetch function for signin is better in app
+
+
   // this function receive data, base on the response
   calculateFaceLocation = data => {
     console.log(data.outputs[0].data.regions[0].region_info.bounding_box);
@@ -90,7 +94,7 @@ class App extends Component {
       );
   };
 
-  onRouteChange = (route) => {
+  onRouteChange = route => {
     // userd for button signin , signt out and regisiter on the navigation component
     if (route === "signOut") {
       this.setState({ isSignedIn: false });
@@ -101,17 +105,19 @@ class App extends Component {
   };
 
   render() {
-    // without destructuring i have to wire this.state.box , this.state. route etccc so    
-    const {isSignedIn,imageUrl,box,route} = this.state
- 
+    // without destructuring i have to wire this.state.box , this.state. route etccc so
+    const { isSignedIn, imageUrl, box, route } = this.state;
 
     return (
       <div className="App">
         <Particles className="particles" params={particlesOptions} />
-    {/* isSignedIn is passed by pros form the state, if it's true sign out appear else register and sign in appear
+        {/* isSignedIn is passed by pros form the state, if it's true sign out appear else register and sign in appear
     i used destructing
     */}
-        <Navigation isSignedIn={isSignedIn}   onRouteChange={this.onRouteChange} />
+        <Navigation
+          isSignedIn={isSignedIn}
+          onRouteChange={this.onRouteChange}
+        />
 
         {this.state.route === "home" ? (
           <div>
@@ -124,10 +130,7 @@ class App extends Component {
             />
             {/*we pass ImageUrl like a props and use this for lthe input with the image for diplay it here after passed like a propr i can use image url in my component*/}{" "}
             {/*we pass Box state to our component*/}
-            <FaceRecognition
-              box={box}
-              imageUrl={imageUrl}
-            />
+            <FaceRecognition box={box} imageUrl={imageUrl} />
           </div>
         ) : route === "signin" ? (
           <Signin onRouteChange={this.onRouteChange} />

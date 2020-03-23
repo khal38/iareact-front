@@ -2,8 +2,53 @@ import React from "react";
 import "./Signin.css";
 
 //receive onRouteChange from app.js prop
-const Signin = ({onRouteChange}) => {
-  return (
+class Signin extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      signInEmail :'',
+      signInPassword : ''
+    }
+  }
+
+  
+// list to onChange Event, and use the stat in app
+onEmailChange = (event) =>{
+  this.setState({signInEmail : event.target.value})
+
+}
+
+onPasswordChange = (event) =>{
+  this.setState({signInPassword : event.target.value})
+}
+
+onSubtmitSignIn = ()=>{
+  console.log(this.state.signInEmail)
+  console.log(this.state.signInPassword)
+
+  fetch("http://localhost:3001/signin", {
+    method : 'post',
+    headers : {'Content-Type': 'application/json'},
+    body : JSON.stringify({
+      email : this.state.signInEmail,
+      password : this.state.signInPassword,
+    })
+  })
+  .then(resonse => resonse.json())
+  // use the success for manage loggin
+  .then(data => {
+    if (data==="success"){
+      this.props.onRouteChange('home')
+
+    }
+  })
+
+}
+
+  render(){ 
+    // passe de app avec props
+   const {onRouteChange} = this.props
+    return (
     <article className=" br3 ba dark-gray b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
       <main className="pa4 black-80">
         <div className="measure ">
@@ -14,6 +59,8 @@ const Signin = ({onRouteChange}) => {
                 Email
               </label>
               <input
+              // listen an event
+              onChange ={this.onEmailChange}
                 className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
                 type="email"
                 name="email-address"
@@ -25,6 +72,7 @@ const Signin = ({onRouteChange}) => {
                 Password
               </label>
               <input
+              onChange ={this.onPasswordChange}
                 className="b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
                 type="password"
                 name="password"
@@ -38,7 +86,7 @@ const Signin = ({onRouteChange}) => {
 
             <input
             //we want to run the function when 'onClick' append, for that we add an arrow function
-              onClick ={()=>onRouteChange('home')}
+              onClick ={this.onSubtmitSignIn}
               className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
               type="submit"
               value="Sign in"
@@ -53,7 +101,8 @@ const Signin = ({onRouteChange}) => {
         </div>
       </main>
     </article>
-  );
+  );}
+ 
 };
 
 export default Signin;
