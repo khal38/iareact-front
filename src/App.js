@@ -53,7 +53,7 @@ class App extends Component {
 
   // fetch function is better in app
   // we receive a user data from server, and we update the state
-  loadUser = (userData) => {
+  loadUser = userData => {
     this.setState({
       userProfil: {
         id: userData.id,
@@ -63,11 +63,9 @@ class App extends Component {
         joined: userData.joined
       }
     });
-    console.log(this.state.userProfil.email)
-    console.log(this.state.userProfil.name)
-    console.log(this.state.userProfil.password)
-
-
+    console.log(this.state.userProfil.email);
+    console.log(this.state.userProfil.name);
+    console.log(this.state.userProfil.password);
   };
 
   // this function receive data, base on the response
@@ -100,21 +98,34 @@ class App extends Component {
   //imageUrl get display on FaceRecognition component when we click on submti
   onButtonSubmit = () => {
     this.setState({ imageUrl: this.state.input });
-
     console.log("click");
     app.models
       .predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
       //get a response (bunding box)
-      // when we click the button we want calculate face location whit the response we going to run the calculate faceLocation function
-      // the fonction returnr an object in the state boix , the box is needed by the displaFaceBox
+      // when we click the button we want calculate face location whit the response we going to run the calculate faceLocation function  the fonction returnr an object in the state boix , the box is needed by the displaFaceBox
       //when we get the response , we calculateFaceLocation and the display it with displayFacebox
-      .then(response =>
-        this.displayFaceBox(this.calculateFaceLocation(response))
-          //promise
-          .catch(err => {
-            console.log(err);
+      .then(response => {
+        // if we receive a response from Api so we hhtp put entries +
+        if (response) {
+          fetch("http://localhost:3001/image", {
+            method: "put",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: this.state.userProfil.id
+            })
           })
-      );
+          .then(response => response.json())
+            .then(count=> {
+              this.setState (Object.assign(this.state.userProfil,{entries:count}))
+            
+          })
+        }
+        this.displayFaceBox(this.calculateFaceLocation(response));
+      })
+      //promise
+      .catch(err => {
+        console.log(err);
+      });
   };
 
   onRouteChange = route => {
@@ -145,7 +156,11 @@ class App extends Component {
         {this.state.route === "home" ? (
           <div>
             <Logo />
-            <Rank />
+            {/*To update the Rank with the states of the user (loaded above)*/}{" "}
+            <Rank
+              name={this.state.userProfil.name}
+              entries={this.state.userProfil.entries}
+            />{" "}
             {/*we pass onInputChange like a props and use this for link the class onInputChange property*/}
             <ImageLinkForm
               onInputChange={this.onInputChange}
@@ -156,7 +171,8 @@ class App extends Component {
             <FaceRecognition box={box} imageUrl={imageUrl} />
           </div>
         ) : route === "signin" ? (
-          <Signin onRouteChange={this.onRouteChange} />
+          // we pass props loadUser and onRouteChange
+          <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
         ) : (
           <Register
             loadUser={this.loadUser}

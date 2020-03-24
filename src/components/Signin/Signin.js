@@ -34,12 +34,11 @@ onSubtmitSignIn = ()=>{
       password : this.state.signInPassword,
     })
   })
-  .then(resonse => resonse.json())
-  // use the success for manage loggin
-  .then(data => {
-    if (data==="success"){
-      this.props.onRouteChange('home')
-
+  .then(response => response.json())
+  .then(user => {
+    if(user.id){
+      this.props.loadUser(user);
+      this.props.onRouteChange('home');
     }
   })
 

@@ -1,10 +1,14 @@
 import React from "react";
 
-const Rank = () => {
+// I pass two props to update the Rank:
+const Rank = ({name, entries}) => {
+  
   return (
     <div>
-      <div className="white f3">{"Your current Rank is ..."}</div>
-      <div className="white f1">{"#5"}</div>
+      {`${name} , your current entry count is...`}
+      <div className='white f1 '>
+        {entries}
+      </div>
     </div>
   );
 };
