@@ -40,12 +40,35 @@ class App extends Component {
       //track where we are one the page
       route: "signin",
       // used for the navigation button sign in and register
-      isSignedIn: false
+      isSignedIn: false,
+      userProfil: {
+        id: "",
+        name: "",
+        email: "",
+        entries: 0,
+        joined: ""
+      }
     };
   }
 
-// fetch function for signin is better in app
+  // fetch function is better in app
+  // we receive a user data from server, and we update the state
+  loadUser = (userData) => {
+    this.setState({
+      userProfil: {
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        entries: userData.entries,
+        joined: userData.joined
+      }
+    });
+    console.log(this.state.userProfil.email)
+    console.log(this.state.userProfil.name)
+    console.log(this.state.userProfil.password)
 
+
+  };
 
   // this function receive data, base on the response
   calculateFaceLocation = data => {
@@ -135,7 +158,10 @@ class App extends Component {
         ) : route === "signin" ? (
           <Signin onRouteChange={this.onRouteChange} />
         ) : (
-          <Register onRouteChange={this.onRouteChange} />
+          <Register
+            loadUser={this.loadUser}
+            onRouteChange={this.onRouteChange}
+          />
         )}
       </div>
     );
