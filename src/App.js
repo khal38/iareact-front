@@ -114,11 +114,12 @@ class App extends Component {
               id: this.state.userProfil.id
             })
           })
-          .then(response => response.json())
-            .then(count=> {
-              this.setState (Object.assign(this.state.userProfil,{entries:count}))
-            
-          })
+            .then(response => response.json())
+            .then(count => {
+              this.setState(
+                Object.assign(this.state.userProfil, { entries: count })
+              );
+            });
         }
         this.displayFaceBox(this.calculateFaceLocation(response));
       })
@@ -156,7 +157,7 @@ class App extends Component {
         {this.state.route === "home" ? (
           <div>
             <Logo />
-            {/*To update the Rank with the states of the user (loaded above)*/}{" "}
+            {/*To update the Rank with the states of the user (loaded above)*/}
             <Rank
               name={this.state.userProfil.name}
               entries={this.state.userProfil.entries}

@@ -36,6 +36,7 @@ onSubtmitSignIn = ()=>{
   })
   .then(response => response.json())
   .then(user => {
+    // check if the user has an id
     if(user.id){
       this.props.loadUser(user);
       this.props.onRouteChange('home');
@@ -61,7 +62,7 @@ onSubtmitSignIn = ()=>{
               // listen an event
               onChange ={this.onEmailChange}
                 className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
-                type="email"
+                type="email" 
                 name="email-address"
                 id="email-address"
               />
