@@ -27,28 +27,30 @@ const particlesOptions = {
   }
 };
 
+const initialState = {
+  //what user have put in input
+  input: "",
+  //the link that come from input
+  imageUrl: "",
+  box: {},
+  //track where we are one the page
+  route: "signin",
+  // used for the navigation button sign in and register
+  isSignedIn: false,
+  userProfil: {
+    id: "",
+    name: "",
+    email: "",
+    entries: 0,
+    joined: ""
+  }
+};
+
 class App extends Component {
   //constructor for the state
   constructor() {
     super();
-    this.state = {
-      //what user have put in input
-      input: "",
-      //the link that come from input
-      imageUrl: "",
-      box: {},
-      //track where we are one the page
-      route: "signin",
-      // used for the navigation button sign in and register
-      isSignedIn: false,
-      userProfil: {
-        id: "",
-        name: "",
-        email: "",
-        entries: 0,
-        joined: ""
-      }
-    };
+    this.state = initialState;
   }
 
   // fetch function is better in app
@@ -119,11 +121,14 @@ class App extends Component {
               this.setState(
                 Object.assign(this.state.userProfil, { entries: count })
               );
-            });
+            })
+            .catch(console.log)
+            
         }
         this.displayFaceBox(this.calculateFaceLocation(response));
       })
       //promise
+      // catch if clarifai fails
       .catch(err => {
         console.log(err);
       });
@@ -132,7 +137,7 @@ class App extends Component {
   onRouteChange = route => {
     // userd for button signin , signt out and regisiter on the navigation component
     if (route === "signOut") {
-      this.setState({ isSignedIn: false });
+      this.setState(initialState);
     } else if (route === "home") {
       this.setState({ isSignedIn: true });
     } // it's for change the sign route state   state property : state value  , value is changeg by on click in the component who are linked with props
