@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Particles from "react-particles-js";
-import Clarifai from "clarifai";
 import Navigation from "./components/Navigation/Navigation";
 import Signin from "./components/Signin/Signin";
 import Register from "./components/Register/Register";
@@ -11,9 +10,6 @@ import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
 
 import "./App.css";
 
-const app = new Clarifai.App({
-  apiKey: "cc78d8e2640545a1968b375ebb105457"
-});
 // parameter for particles
 const particlesOptions = {
   particles: {
@@ -101,11 +97,14 @@ class App extends Component {
   onButtonSubmit = () => {
     this.setState({ imageUrl: this.state.input });
     console.log("click");
-    app.models
-      .predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
-      //get a response (bunding box)
-      // when we click the button we want calculate face location whit the response we going to run the calculate faceLocation function  the fonction returnr an object in the state boix , the box is needed by the displaFaceBox
-      //when we get the response , we calculateFaceLocation and the display it with displayFacebox
+    fetch("http://localhost:3001/imageurl", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        input: this.state.input
+      })
+    })
+      .then(response => response.json())
       .then(response => {
         // if we receive a response from Api so we hhtp put entries +
         if (response) {
@@ -122,8 +121,7 @@ class App extends Component {
                 Object.assign(this.state.userProfil, { entries: count })
               );
             })
-            .catch(console.log)
-            
+            .catch(console.log);
         }
         this.displayFaceBox(this.calculateFaceLocation(response));
       })
@@ -136,7 +134,7 @@ class App extends Component {
 
   onRouteChange = route => {
     // userd for button signin , signt out and regisiter on the navigation component
-    if (route === "signOut") {
+    if (route === "signin") {
       this.setState(initialState);
     } else if (route === "home") {
       this.setState({ isSignedIn: true });
@@ -180,11 +178,11 @@ class App extends Component {
           // we pass props loadUser and onRouteChange
           <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
         ) : (
-          <Register
-            loadUser={this.loadUser}
-            onRouteChange={this.onRouteChange}
-          />
-        )}
+              <Register
+                loadUser={this.loadUser}
+                onRouteChange={this.onRouteChange}
+              />
+            )}
       </div>
     );
   }

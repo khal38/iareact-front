@@ -35,7 +35,7 @@ class Register extends React.Component {
     })
       .then(response => response.json())
       .then(userData => {
-        if (userData) {
+        if (userData.id) {
           // user is form the response, we send user created from server to app.js state and that upload
           this.props.loadUser(userData)
           this.props.onRouteChange('home');
@@ -84,7 +84,7 @@ class Register extends React.Component {
             <div className="">
               <input
                 onClick={this.onSubmitSignIn}
-                className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
+                className=" b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
                 type="submit"
                 value="Register"
               />
